@@ -8,4 +8,4 @@ Thumbs.db
 *.exe
 
 # Skill downloads (keep registry, exclude zips)
-skills/*.zip
+# skills/*.zip  - keep zips in repo for direct download
