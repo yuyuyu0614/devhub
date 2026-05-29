@@ -1,0 +1,57 @@
+{
+  "name": "devhub",
+  "version": "1.0.0",
+  "description": "DevHub - 个人 AI 编码中枢桌面应用",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "ai",
+    "coding",
+    "claude",
+    "desktop"
+  ],
+  "author": "DevHub",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "dependencies": {
+    "ansi_up": "^6.0.6",
+    "ansi-to-html": "^0.7.2",
+    "devhub": "file:",
+    "highlight.js": "^11.11.1",
+    "marked": "^12.0.2"
+  },
+  "build": {
+    "appId": "com.devhub.app",
+    "productName": "DevHub",
+    "copyright": "Copyright 2025 DevHub",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "scripts",
+        "to": "scripts"
+      }
+    ],
+    "win": {
+      "icon": "app.ico",
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "DevHub-Setup.exe"
+    }
+  }
+}

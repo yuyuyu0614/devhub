@@ -1,0 +1,31 @@
+{
+  "plugins": [
+    {
+      "id": "novelcraft",
+      "name": "NovelCraft",
+      "port": 9020,
+      "endpoint": "/api/articles/list",
+      "icon": "📝",
+      "category": "写作",
+      "description": "小说创作助手"
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama",
+      "port": 11434,
+      "endpoint": "/api/tags",
+      "icon": "🦙",
+      "category": "AI",
+      "description": "本地大模型运行时"
+    },
+    {
+      "id": "litellm",
+      "name": "LiteLLM",
+      "port": 11435,
+      "endpoint": "/health",
+      "icon": "🔗",
+      "category": "代理",
+      "description": "Anthropic 兼容代理"
+    }
+  ]
+}
