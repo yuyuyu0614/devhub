@@ -2050,6 +2050,144 @@
             await this.showAlert('下载失败: ' + e.message);
         }
     }
+
+    // ========== Skill 市场 ==========
+
+    async loadSkillMarket() {
+        const container = document.getElementById('skill-market-list');
+        if (!container) return;
+
+        container.innerHTML = '<div style="padding:8px;text-align:center;color:var(--text-secondary);font-size:12px;">加载中...</div>';
+
+        try {
+            const registry = await window.SkillInstaller.fetchRegistry();
+            if (!registry || !registry.skills || registry.skills.length === 0) {
+                container.innerHTML = '<div style="padding:8px;text-align:center;color:var(--text-secondary);font-size:12px;">暂无可用的 Skill</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            const projectPath = this.currentProject?.path || '';
+            for (const skill of registry.skills) {
+                const installed = await window.SkillInstaller.isSkillInstalled(skill, projectPath);
+                container.appendChild(this._createSkillMarketItem(skill, installed));
+            }
+        } catch (e) {
+            console.error('[SkillMarket] 加载失败:', e);
+            container.innerHTML = '<div style="padding:8px;text-align:center;color:var(--text-secondary);font-size:12px;">加载失败，点击刷新重试</div>';
+        }
+
+        const refreshBtn = document.getElementById('refresh-skill-market-btn');
+        if (refreshBtn) {
+            refreshBtn.onclick = () => this.loadSkillMarket();
+        }
+    }
+
+    _createSkillMarketItem(skill, installed) {
+        const div = document.createElement('div');
+        div.className = 'skill-market-item';
+        const sizeKB = Math.round(skill.size / 1024);
+        div.innerHTML = '<div class="skill-icon">' + (skill.icon || '📦') + '</div>' +
+            '<div class="skill-info">' +
+            '<h4>' + skill.name + ' <span style="font-weight:400;font-size:10px;color:var(--text-secondary);">v' + skill.version + '</span></h4>' +
+            '<p>' + skill.description + '</p>' +
+            '<div class="skill-meta">' + skill.category + ' · ' + sizeKB + 'KB · ' + skill.author + '</div>' +
+            '</div>' +
+            '<div class="skill-action">' +
+            (installed
+                ? '<button class="skill-installed-badge">已安装</button>'
+                : '<button class="skill-install-btn" data-skill-id="' + skill.id + '">安装</button>') +
+            '</div>';
+
+        if (!installed) {
+            div.querySelector('.skill-install-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this._installSkillFlow(skill);
+            });
+        }
+
+        return div;
+    }
+
+    async _installSkillFlow(skill) {
+        if (!this.currentProject || !this.currentProject.path) {
+            await this.showAlert('请先在左侧添加并选择一个项目');
+            return;
+        }
+
+        const confirmed = await this.showConfirm(
+            '即将安装 ' + skill.name + ' v' + skill.version + '\n\n' + skill.description + '\n\n安装路径：' + skill.installPath + '\n\n继续？',
+            '安装 Skill',
+            false
+        );
+        if (!confirmed) return;
+
+        const btn = document.querySelector('[data-skill-id="' + skill.id + '"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '...';
+        }
+
+        try {
+            const result = await window.SkillInstaller.installSkill(
+                skill,
+                this.currentProject.path,
+                (status, pct) => {
+                    if (btn) {
+                        const labels = { connecting: '连接中', downloading: '下载中', extracting: '解压中', writing: '写入中', done: '完成' };
+                        btn.textContent = labels[status] || status;
+                    }
+                }
+            );
+
+            await this.showAlert(skill.name + ' 安装成功！\n\n文件数: ' + result.fileCount + '\n路径: ' + result.installDir, '安装完成');
+            this.loadSkillMarket();
+        } catch (e) {
+            await this.showAlert('安装失败: ' + e.message);
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = '重试';
+            }
+        }
+    }
+
+    async showSkillWelcome() {
+        if (this.settings?.skillWelcomeShown) return;
+
+        setTimeout(async () => {
+            try {
+                const registry = await window.SkillInstaller.fetchRegistry();
+                if (!registry || !registry.skills || registry.skills.length === 0) return;
+
+                let skillList = '';
+                for (const s of registry.skills) {
+                    skillList += '  ' + (s.icon || '') + ' ' + s.name + ' - ' + s.description.substring(0, 40) + '...\n';
+                }
+
+                const confirmed = await this.showConfirm(
+                    '欢迎使用 DevHub！\n\n我们提供以下官方 Skill 以增强功能：\n\n' + skillList + '\n是否前往设置页面安装？',
+                    'Skill 推荐',
+                    false
+                );
+
+                if (confirmed) {
+                    this.showSettingsModal();
+                    setTimeout(() => {
+                        const market = document.getElementById('skill-market-list');
+                        if (market) market.scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            if (this.settings) {
+                this.settings.skillWelcomeShown = true;
+                await window.electronAPI.saveSettings(this.settings);
+            }
+        }, 1000);
+    }
+
 }
 
 // 应用启动

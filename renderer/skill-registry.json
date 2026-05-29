@@ -1,0 +1,39 @@
+﻿{
+  "skills": [
+    {
+      "id": "verdict-coze",
+      "name": "Verdict-Coze",
+      "version": "1.0.0",
+      "description": "源代码智能判决引擎 — 多层分析管线，检测 AI 生成痕迹、代码风格一致性、逻辑空洞",
+      "author": "DevHub",
+      "category": "安全审计",
+      "icon": "⚖️",
+      "tags": ["ai-detection", "code-analysis", "forensics"],
+      "filename": "Verdict-Coze-Skill.zip",
+      "downloadUrl": "https://github.com/yuyuyu0614/devhub/releases/latest/download/Verdict-Coze-Skill.zip",
+      "fallbackUrl": "https://raw.githubusercontent.com/yuyuyu0614/devhub/main/skills/Verdict-Coze-Skill.zip",
+      "size": 54997,
+      "installPath": ".claude/skills/verdict-coze",
+      "entrypoint": "main.py",
+      "requires": ["python3"]
+    },
+    {
+      "id": "vulnforge",
+      "name": "VulnForge",
+      "version": "1.0.0",
+      "description": "AI 驱动的漏洞挖掘与代码安全扫描 — CWE 分类、Secrets 检测、模式匹配 + 幻觉过滤",
+      "author": "DevHub",
+      "category": "安全审计",
+      "icon": "🔍",
+      "tags": ["vulnerability", "security", "cwe", "secrets"],
+      "filename": "VulnForge_Coze.zip",
+      "downloadUrl": "https://github.com/yuyuyu0614/devhub/releases/latest/download/VulnForge_Coze.zip",
+      "fallbackUrl": "https://raw.githubusercontent.com/yuyuyu0614/devhub/main/skills/VulnForge_Coze.zip",
+      "size": 60103,
+      "installPath": ".claude/skills/vulnforge",
+      "entrypoint": "coze_entry.py",
+      "requires": ["python3", "pip:semgrep", "pip:pyyaml"]
+    }
+  ],
+  "updatedAt": "2026-05-29T12:00:00Z"
+}

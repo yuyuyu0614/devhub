@@ -1,31 +1,31 @@
-const { contextBridge, ipcRenderer } = require('electron');
+﻿const { contextBridge, ipcRenderer } = require('electron');
 
-// 安全地暴露 API 给渲染进程
-contextBridge.exposeInMainWorld('electronAPI', {
-  // claude 命令调用
+// 瀹夊叏鍦版毚闇?API 缁欐覆鏌撹繘绋?contextBridge.exposeInMainWorld('electronAPI', {
+  // claude 鍛戒护璋冪敤
   callClaude: (message, model, projectPath, options, history) =>
     ipcRenderer.invoke('call-claude', { message, model, projectPath, options, history }),
   stopClaude: () => ipcRenderer.invoke('stop-claude'),
   getSystemMemory: () => ipcRenderer.invoke('get-system-memory'),
   
-  // 文件系统操作
+  // 鏂囦欢绯荤粺鎿嶄綔
   readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
   writeFile: (filePath, content) => ipcRenderer.invoke('write-file', filePath, content),
   readDir: (dirPath) => ipcRenderer.invoke('read-dir', dirPath),
   mkdir: (dirPath) => ipcRenderer.invoke('mkdir', dirPath),
   deleteFile: (filePath) => ipcRenderer.invoke('delete-file', filePath),
+  extractZip: (payload) => ipcRenderer.invoke('extract-zip', payload),
   openFile: (filePath) => ipcRenderer.invoke('open-file', filePath),
   
-  // 应用设置
+  // 搴旂敤璁剧疆
   getSettings: () => ipcRenderer.invoke('get-settings'),
   saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
   
-  // 项目管理
+  // 椤圭洰绠＄悊
   getProjects: () => ipcRenderer.invoke('get-projects'),
   saveProjects: (projects) => ipcRenderer.invoke('save-projects', projects),
   openDirectoryDialog: () => ipcRenderer.invoke('open-directory-dialog'),
   
-  // 会话管理
+  // 浼氳瘽绠＄悊
   getSessions: (projectName) => ipcRenderer.invoke('get-sessions', projectName),
   saveSession: (projectName, sessionId, sessionData) => 
     ipcRenderer.invoke('save-session', projectName, sessionId, sessionData),
@@ -38,7 +38,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   reorderSessions: (projectName, orderedIds) =>
     ipcRenderer.invoke('reorder-sessions', projectName, orderedIds),
   
-  // 事件监听
+  // 浜嬩欢鐩戝惉
   onClaudeOutput: (callback) => {
     ipcRenderer.on('claude-output', (event, data) => callback(data));
   },
@@ -61,12 +61,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('toggle-theme', () => callback());
   },
   
-  // Token 用量数据库
-  saveTokenUsage: (usage) => ipcRenderer.invoke('save-token-usage', usage),
+  // Token 鐢ㄩ噺鏁版嵁搴?  saveTokenUsage: (usage) => ipcRenderer.invoke('save-token-usage', usage),
   getTokenUsage: (period, projectName) => ipcRenderer.invoke('get-token-usage', period, projectName),
   getTokenSummary: (period) => ipcRenderer.invoke('get-token-summary', period),
   
-  // Git 操作
+  // Git 鎿嶄綔
   gitDiff: (projectPath, stagedOnly) => ipcRenderer.invoke('git-diff', projectPath, stagedOnly),
   gitDiffFile: (projectPath, filePath) => ipcRenderer.invoke('git-diff-file', projectPath, filePath),
   gitStagedFiles: (projectPath) => ipcRenderer.invoke('git-staged-files', projectPath),
@@ -75,14 +74,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   gitBranch: (projectPath) => ipcRenderer.invoke('git-branch', projectPath),
   gitRepoRoot: (projectPath) => ipcRenderer.invoke('git-repo-root', projectPath),
 
-  // 代码审查
+  // 浠ｇ爜瀹℃煡
   codeReview: (params) => ipcRenderer.invoke('code-review', params),
   stopReview: () => ipcRenderer.invoke('stop-review'),
 
-  // Reviewdog lint 补充
+  // Reviewdog lint 琛ュ厖
   runReviewdog: (projectPath) => ipcRenderer.invoke('run-reviewdog', projectPath),
 
-  // 代码审查事件
+  // 浠ｇ爜瀹℃煡浜嬩欢
   onReviewOutput: (callback) => {
     ipcRenderer.on('review-output', (event, data) => callback(data));
   },
@@ -90,7 +89,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('review-error', (event, data) => callback(data));
   },
 
-  // 移除事件监听
+  // 绉婚櫎浜嬩欢鐩戝惉
   removeAllListeners: (channel) => {
     ipcRenderer.removeAllListeners(channel);
   }

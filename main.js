@@ -461,6 +461,25 @@ ipcMain.handle('open-file', async (event, filePath) => {
   await shell.openPath(filePath);
   return true;
 });
+ipcMain.handle('extract-zip', async (event, { data, targetDir }) => {
+  if (!isSafePath(targetDir)) throw new Error('Path not in allowed scope: ' + targetDir);
+
+  fs.mkdirSync(targetDir, { recursive: true });
+  const tmpZip = path.join(appDataDir, '_tmp_skill.zip');
+  fs.writeFileSync(tmpZip, Buffer.from(data));
+
+  const { execSync } = require('child_process');
+  const psCmd = 'Expand-Archive -Path ''' + tmpZip + ''' -DestinationPath ''' + targetDir + ''' -Force';
+  try {
+    execSync('powershell -Command "' + psCmd + '"', { timeout: 30000, windowsHide: true });
+  } catch (e) {
+    if (fs.existsSync(tmpZip)) fs.unlinkSync(tmpZip);
+    throw new Error('解压失败: ' + e.message);
+  }
+
+  if (fs.existsSync(tmpZip)) fs.unlinkSync(tmpZip);
+  return { success: true, targetDir };
+});
 
 ipcMain.handle('get-settings', () => {
   ensureAppDataDir();

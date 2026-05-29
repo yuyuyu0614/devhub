@@ -6,3 +6,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.exe
+
+# Skill downloads (keep registry, exclude zips)
+skills/*.zip
